@@ -147,9 +147,8 @@ caddy file-server --root ./release/dist --listen :8088
 
 ## 🧑‍💻 作者信息
 
-**Amber Chen (AllanChan)**  
-📍 University of Sydney · Master of Economics  
-💼 Internship @ WSP Australia (Strategic Advisory)  
+**AllanChan**  
+📍 广州南方学院
 📧 allan10w@github.com  
 🌐 [GitHub Profile](https://github.com/Allan10w)
 
@@ -158,4 +157,4 @@ caddy file-server --root ./release/dist --listen :8088
 ## 📜 License
 
 This project is licensed under the MIT License.  
-Copyright (c) 2025 Amber Chen
+Copyright (c) 2025 AllanChan
