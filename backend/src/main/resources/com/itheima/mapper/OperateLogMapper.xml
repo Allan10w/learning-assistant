@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.OperateLogMapper">
+
+    <resultMap id="OperateLogMap" type="com.itheima.pojo.OperateLog">
+        <id     property="id"             column="id"/>
+        <result property="operateEmpId"   column="operateEmpId"/>
+        <result property="operateTime"    column="operateTime"/>
+        <result property="className"      column="className"/>
+        <result property="methodName"     column="methodName"/>
+        <result property="methodParams"   column="methodParams"/>
+        <result property="returnValue"    column="returnValue"/>
+        <result property="costTime"       column="costTime"/>
+        <result property="operateEmpName" column="operateEmpName"/>
+    </resultMap>
+
+    <!-- 插入日志 -->
+    <insert id="insert" parameterType="com.itheima.pojo.OperateLog">
+        insert into operate_log
+        (operate_emp_id, operate_time, class_name, method_name, method_params, return_value, cost_time)
+        values
+            (#{operateEmpId}, #{operateTime}, #{className}, #{methodName}, #{methodParams}, #{returnValue}, #{costTime})
+    </insert>
+
+    <!-- 查询全部日志（PageHelper 会自动拼 limit/offset） -->
+    <select id="listAll" resultMap="OperateLogMap">
+        select
+            ol.id,
+            ol.operate_emp_id   as operateEmpId,
+            ol.operate_time     as operateTime,
+            ol.class_name       as className,
+            ol.method_name      as methodName,
+            ol.method_params    as methodParams,
+            ol.return_value     as returnValue,
+            ol.cost_time        as costTime,
+            e.name              as operateEmpName
+        from operate_log ol
+                 left join emp e on e.id = ol.operate_emp_id
+        order by ol.operate_time desc
+    </select>
+
+</mapper>

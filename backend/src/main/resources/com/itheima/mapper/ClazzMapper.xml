@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.ClazzMapper">
+
+    <select id="findAll" resultType="com.itheima.pojo.Clazz">
+        <![CDATA[
+        SELECT
+            c.id,
+            c.name,
+            c.room,
+            c.begin_date AS beginDate,
+            c.end_date AS endDate,
+            c.master_id AS masterId,
+            c.create_time AS createTime,
+            c.update_time AS updateTime,
+            e.name AS masterName,
+            CASE
+                WHEN CURDATE() > c.end_date THEN '已结课'
+                WHEN CURDATE() < c.begin_date THEN '未开班'
+                ELSE '在读中'
+                END AS status
+        FROM clazz c
+                 LEFT JOIN emp e ON c.master_id = e.id
+        ]]>
+    </select>
+</mapper>
