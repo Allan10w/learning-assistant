@@ -147,7 +147,7 @@ caddy file-server --root ./release/dist --listen :8088
 
 ## 🧑‍💻 作者信息
 
-**AllanChan**  
+**陈熙龙**  
 📍 广州南方学院
 📧 allan10w@github.com  
 🌐 [GitHub Profile](https://github.com/Allan10w)
