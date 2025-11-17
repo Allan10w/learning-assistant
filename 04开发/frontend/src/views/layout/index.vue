@@ -34,7 +34,7 @@ const logout = () => {
     <el-container>
       <!-- Header 区域 -->
       <el-header class="header">
-        <span class="title">Tlias智能学习辅助系统</span>
+        <span class="title">陈熙龙Atlas智能学习辅助系统</span>
         <span class="right_tool">
           <a href="">
             <el-icon><EditPen /></el-icon> 修改密码 &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;
@@ -110,7 +110,8 @@ const logout = () => {
 
 <style scoped>
 .header {
-  background-image: linear-gradient(to right, #00547d, #007fa4, #00aaa0, #00d072, #a8eb12);
+  background-image: linear-gradient(90deg, #0ea5e9 0%, #14b8a6 50%, #22c55e 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .title {
@@ -119,6 +120,8 @@ const logout = () => {
   font-family: 楷体;
   line-height: 60px;
   font-weight: bolder;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .right_tool{
@@ -127,13 +130,25 @@ const logout = () => {
 }
 
 a {
-  color: white;
+  color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
+  transition: color .2s ease, opacity .2s ease;
+}
+
+.right_tool a:hover {
+  color: #ffffff;
+  opacity: 1;
 }
 
 .aside {
   width: 220px;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
   height: 730px;
+}
+
+/* 主体区域轻柔背景，提升层次感 */
+:deep(.el-main) {
+  background-color: #f7fafc;
 }
 </style>
