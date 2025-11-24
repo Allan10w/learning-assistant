@@ -84,7 +84,7 @@ pipeline {
                 sh "git tag -a ${tagName} -m 'Jenkins build ${BUILD_NUMBER}'"
                 // 需要有 push 权限的凭证
                 withCredentials([usernamePassword(credentialsId: "${GIT_CREDENTIAL_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@your-git-repo-url.git ${tagName}"
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Allan10w/learning-assistant.git ${tagName}"
                 }
                 
                 emailext (
