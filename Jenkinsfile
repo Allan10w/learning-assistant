@@ -12,7 +12,7 @@ pipeline {
         // 请在 Jenkins 凭证管理中配置 git-credentials-id
         GIT_CREDENTIAL_ID = 'git-credentials-id'
         // 邮件接收人列表，多个用逗号分隔
-        EMAIL_RECIPIENTS = 'team-member1@example.com,team-member2@example.com'
+        EMAIL_RECIPIENTS = '1484096635@qq.com,2823546988@qq.com'
     }
 
     stages {
