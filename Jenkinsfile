@@ -62,11 +62,20 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                script {
-                    echo '正在部署...'
-                    // 这里是模拟部署，实际部署请替换为 scp, docker push, 或 kubectl apply 等命令
-                    echo 'Deploying application to server...'
-                    // sh './deploy_script.sh'
+                dir('04开发/deploy') {
+                    script {
+                        echo '正在部署...'
+                        // 尝试停止旧容器（如果有）并启动新容器
+                        // 注意：需要确保 Jenkins 节点安装了 docker-compose 并有权限执行
+                        try {
+                            sh 'docker-compose down || true'
+                            sh 'docker-compose up -d --build'
+                            echo '部署完成！应用正在后台运行。'
+                        } catch (Exception e) {
+                            echo "部署失败: ${e.getMessage()}"
+                            throw e
+                        }
+                    }
                 }
             }
         }

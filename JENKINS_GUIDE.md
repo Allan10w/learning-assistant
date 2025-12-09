@@ -1,6 +1,52 @@
 # Jenkins 配置指南
 
-为了确保 `Jenkinsfile` 能顺利运行，请按照以下步骤配置您的 Jenkins 环境。
+为了确保 `Jenkinsfile` 能顺利运行，特别是自动构建和部署功能，请按照以下步骤配置您的 Jenkins 服务器环境。
+
+## 0. 服务器环境准备 (关键步骤)
+
+在运行 Jenkins 的服务器上，必须安装并配置好以下环境。
+
+### 1. 安装 Docker 和 Docker Compose
+
+#### macOS 用户
+推荐使用 **Docker Desktop for Mac**。
+1.  **下载安装**: 访问 Docker 官网下载安装，或者使用 Homebrew:
+    ```bash
+    brew install --cask docker
+    ```
+2.  **启动**: 安装完成后，请务必启动 Docker Desktop 应用，并等待左下角状态变为绿色的 "Running"。
+
+#### Linux (Ubuntu/Debian) 用户
+```bash
+sudo apt-get update
+sudo apt-get install docker.io docker-compose -y
+```
+
+### 2. 配置 Jenkins 权限与环境
+
+#### macOS 用户
+如果您是通过 Homebrew (`brew install jenkins-lts`) 安装的 Jenkins：
+1.  **以及当前用户运行**: Homebrew 默认会让 Jenkins 以当前登录用户身份运行，这就意味着它通常可以直接访问 Docker Desktop，**无需**像 Linux 那样配置用户组。
+2.  **关键：环境变量问题**: Jenkins 在 macOS 上经常遇到找不到 `docker` 命令的问题。
+    *   请前往 Jenkins 面板 -> **Manage Jenkins** -> **System** -> **Global properties**。
+    *   勾选 **Environment variables**。
+    *   添加变量 `PATH`，值为 `/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH` (或者你在终端输入 `echo $PATH` 得到的完整路径)。这能确保 Jenkins 找到 `docker` 和 `docker-compose` 命令。
+
+#### Linux 用户
+Jenkins 默认运行在 `jenkins` 用户下，必须配置权限：
+```bash
+# 1. 将 jenkins 用户加入 docker 组
+sudo usermod -aG docker jenkins
+# 2. 重启 Jenkins 服务
+sudo systemctl restart jenkins
+```
+
+### 3. 确认端口与数据库
+*   **端口未占用**: 确保本地 **80** 和 **8080** 端口空闲。
+*   **数据库**: Docker Desktop for Mac 支持使用 `host.docker.internal` 访问宿主机上的 MySQL 服务。请确保你 Mac 本地的 MySQL 是启动状态。
+
+---
+
 
 ## 1. 安装必要插件
 
@@ -66,3 +112,24 @@
 -   查看 **Console Output** 确认构建过程。
 -   点击 **Allure Report** 查看测试报告。
 -   检查您的邮箱是否收到通知。
+
+## 7. 验证部署结果
+
+构建成功后，您的应用已经自动部署在当前服务器（本机）上。
+
+### 1. 访问应用
+*   **前端页面**: 打开浏览器访问 [http://localhost](http://localhost)
+*   **后端接口**: [http://localhost:8080](http://localhost:8080)
+
+### 2. 查看运行状态
+在终端运行以下命令查看容器状态：
+```bash
+docker ps
+```
+您应该能看到名为 `tlias-frontend` and `tlias-backend` 的两个容器正在运行。
+
+### 3. 查看构建产物 (物理文件)
+如果您需要查看编译生成的 JAR 包或静态文件，它们位于 Jenkins 的工作目录中：
+*   **前端构建产物**: `~/.jenkins/workspace/<任务名称>/04开发/frontend/dist/`
+*   **后端 JAR 包**: `~/.jenkins/workspace/<任务名称>/04开发/backend/target/`
+

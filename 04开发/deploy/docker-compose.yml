@@ -1,0 +1,24 @@
+version: '3'
+services:
+  backend:
+    build: ../backend
+    container_name: tlias-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # 如果数据库在宿主机，Mac/Windows使用 host.docker.internal，Linux可能需要其他配置
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/tlias
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Cxl_0613
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    build: ../frontend
+    container_name: tlias-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
