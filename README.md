@@ -137,11 +137,40 @@ caddy file-server --root ./release/dist --listen :8088
 
 ---
 
+
+## 🐳 Docker 与 Jenkins 自动化部署
+
+本项目已完全支持容器化与自动化集成部署 (CI/CD)。
+
+### 1. 快速启动 (Docker Compose)
+无需手动安装 Java/Node 环境，只要有 Docker 即可一键运行：
+```bash
+# 进入部署目录
+cd 04开发/deploy
+
+# 一键构建并启动
+docker-compose up -d --build
+```
+- **前端访问**: [http://localhost](http://localhost)
+- **后端接口**: [http://localhost:8080](http://localhost:8080)
+
+### 2. Jenkins 自动化流水线
+项目根目录包含标准 `Jenkinsfile`，配合 `JENKINS_GUIDE.md` 可实现：
+- ✅ **自动拉取**: 监听 Git 提交
+- ✅ **自动构建**: Maven (后端) + Node.js (前端)
+- ✅ **自动测试**: 运行单元测试并生成 Allure 报告
+- ✅ **自动部署**: 构建 Docker 镜像并替换旧容器
+- ✅ **结果通知**: 钉钉/邮件通知构建状态
+
+👉 **详细配置指南请查看: [JENKINS_GUIDE.md](./JENKINS_GUIDE.md)**
+
+---
+
 ## 🪄 未来改进计划
 - [ ] 用户权限与角色管理  
 - [ ] 在线测验模块（教师端创建 + 学生端答题）  
 - [ ] 移动端界面适配  
-- [ ] 使用 Docker 实现一键部署  
+- [✅] 使用 jenkins+Docker 实现一键部署  
 
 ---
 
