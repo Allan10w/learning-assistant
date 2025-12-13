@@ -21,17 +21,19 @@ pipeline {
                 script {
                     echo '正在拉取代码...'
                     checkout scm
+                    // 拉取当前流水线代码来源
+                    // 如果你在jenkins任务里配的是GitHub仓库，他就自动拉取那个仓库的最新代码
                 }
             }
         }
 
         stage('Build Frontend') {
             steps {
-                dir('04开发/frontend') {
+                dir('04开发/frontend') { // 切换工作目录到前端源码文件夹
                     script {
                         echo '正在构建前端...'
-                        sh 'npm install'
-                        sh 'npm run build'
+                        sh 'npm install'  //安装依赖
+                        sh 'npm run build' //构建
                     }
                 }
             }
@@ -43,7 +45,9 @@ pipeline {
                     script {
                         echo '正在构建后端...'
                         // -DskipTests=false 确保运行测试以生成报告
+                        // 执行Maven打包命令
                         sh 'mvn clean package -DskipTests=false'
+
                     }
                 }
             }
@@ -53,8 +57,8 @@ pipeline {
             steps {
                 script {
                     echo '正在生成测试报告...'
-                    // 假设 Surefire 插件生成的报告在 target/surefire-reports
-                    // Allure 插件会读取这些结果
+                    // 使用Allure插件收集测试结果
+                    // 在'target/surefire-reports' 目录下找 Maven 运行测试生成的 xml 文件
                     allure includeProperties: false, jdk: '', results: [[path: '04开发/backend/target/surefire-reports']]
                 }
             }
@@ -68,9 +72,13 @@ pipeline {
                         // 尝试停止旧容器（如果有）并启动新容器
                         // 注意：需要确保 Jenkins 节点安装了 docker-compose 并有权限执行
                         try {
+                            // 1.停止并移除旧容器
                             sh 'docker-compose down || true'
+                            // 2.构建新镜像并后台启动
                             sh 'docker-compose up -d --build'
                             echo '部署完成！应用正在后台运行。'
+                            //这一步调用了宿主机的 Docker 命令。Docker 会读取刚才前后端构建生成的产物
+                            //（Frontend 的 dist 和 Backend 的 jar），把它们分别打包进新的镜像里，然后启动。
                         } catch (Exception e) {
                             echo "部署失败: ${e.getMessage()}"
                             throw e
