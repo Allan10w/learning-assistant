@@ -34,7 +34,7 @@ const logout = () => {
     <el-container>
       <!-- Header 区域 -->
       <el-header class="header">
-        <span class="title">陈熙龙Atlas智能学习辅助系统</span>
+        <span class="title">智能学习辅助系统</span>
         <span class="right_tool">
           <a href="">
             <el-icon><EditPen /></el-icon> 修改密码 &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;
