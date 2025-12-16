@@ -31,7 +31,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir('04开发/frontend') { // 切换工作目录到前端源码文件夹
+                dir('04 dev/frontend') { // 切换工作目录到前端源码文件夹
                     script {
                         echo '正在构建前端...'
                         sh 'npm install'  //安装依赖
@@ -43,7 +43,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('04开发/backend') {
+                dir('04 dev/backend') {
                     script {
                         echo '正在构建后端...'
                         // -DskipTests=false 确保运行测试以生成报告
@@ -61,14 +61,30 @@ pipeline {
                     echo '正在生成测试报告...'
                     // 使用Allure插件收集测试结果
                     // 在'target/surefire-reports' 目录下找 Maven 运行测试生成的 xml 文件
-                    allure includeProperties: false, jdk: '', results: [[path: '04开发/backend/target/surefire-reports']]
+                    allure includeProperties: false, jdk: '', results: [[path: '04 dev/backend/target/surefire-reports']]
                 }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('04 dev/backend') {
+                    script {
+                        echo '正在进行代码质量与安全扫描...'
+                        // 需要在Jenkins中配置SonarQube服务器 (Manage Jenkins -> System -> SonarQube servers)
+                        // 这里的 'SonarQube' 是你在Jenkins设置里给服务器起的名字
+                        withSonarQubeEnv('SonarQube') {
+                            // 执行Maven Sonar插件，jacoco报告会自动被识别
+                            sh 'mvn sonar:sonar'
+                        }
+                    }
+                }
+            }
+        }
             }
         }
 
         stage('Deploy') {
             steps {
-                dir('04开发/deploy') {
+                dir('04 dev/deploy') {
                     script {
                         echo '正在部署...'
                         // 尝试停止旧容器（如果有）并启动新容器
