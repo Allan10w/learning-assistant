@@ -63,6 +63,8 @@ pipeline {
                     // 在'target/surefire-reports' 目录下找 Maven 运行测试生成的 xml 文件
                     allure includeProperties: false, jdk: '', results: [[path: '04 dev/backend/target/surefire-reports']]
                 }
+            }
+        }
 
         stage('SonarQube Analysis') {
             steps {
@@ -77,8 +79,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
             }
         }
 
