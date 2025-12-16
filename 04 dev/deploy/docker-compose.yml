@@ -1,4 +1,4 @@
-# 同时管理前后端两个容器
+# 同时管理前后端两个容器，定义了前端 (frontend) 和后端 (backend) 两个服务，并编排了它们的启动顺序、网络连接和端口映射。
 version: '3' # 指定docker-compose版本
 services:
   # 定义服务
