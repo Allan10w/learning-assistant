@@ -11,7 +11,8 @@ pipeline {
     environment {
         // 环境变量配置
         // 请在 Jenkins 凭证管理中配置 git-credentials-id
-        GIT_CREDENTIAL_ID = 'git-credentials-id'
+        GIT_CREDENTIAL_ID = 'gitee-credentials-id'
+        GITHUB_CREDENTIAL_ID = 'git-credentials-id' // 请在 Jenkins 中配置 GitHub 凭据
         // 邮件接收人列表，多个用逗号分隔
         EMAIL_RECIPIENTS = '1484096635@qq.com,2823546988@qq.com'
     }
@@ -117,9 +118,23 @@ pipeline {
                 
                 def tagName = "release-${BUILD_NUMBER}-${new Date().format('yyyyMMddHHmmss')}"
                 sh "git tag -a ${tagName} -m 'Jenkins build ${BUILD_NUMBER}'"
-                // 需要有 push 权限的凭证
+                
+                // 1. 推送代码和标签到 Gitee
+                echo '正在推送代码和标签到 Gitee...'
                 withCredentials([usernamePassword(credentialsId: "${GIT_CREDENTIAL_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Allan10w/learning-assistant.git ${tagName}"
+                    // 推送当前分支
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitee.com/allanchanice/learning-assistant.git HEAD:master"
+                    // 推送标签
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitee.com/allanchanice/learning-assistant.git ${tagName}"
+                }
+
+                // 2. 推送代码和标签到 GitHub (实现双平台同步)
+                echo '正在推送代码和标签到 GitHub...'
+                withCredentials([usernamePassword(credentialsId: "${GITHUB_CREDENTIAL_ID}", passwordVariable: 'GH_PASSWORD', usernameVariable: 'GH_USERNAME')]) {
+                    // 推送当前分支
+                    sh "git push https://${GH_USERNAME}:${GH_PASSWORD}@github.com/Allan10w/learning-assistant.git HEAD:master"
+                    // 推送标签
+                    sh "git push https://${GH_USERNAME}:${GH_PASSWORD}@github.com/Allan10w/learning-assistant.git ${tagName}"
                 }
                 
                 emailext (
