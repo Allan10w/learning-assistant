@@ -1,0 +1,23 @@
+# ===== Frontend (Vite) =====
+node_modules/
+dist/
+*.log
+
+# ===== Backend (Spring Boot) =====
+target/
+*.class
+*.jar
+*.war
+*.log
+
+# ===== IDE / System =====
+.idea/
+.vscode/
+.DS_Store
+
+# ===== Environment / Temp =====
+.env
+.env.*
+*.local
+*.out
+*.pid

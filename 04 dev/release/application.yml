@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: learning-assistant
+  datasource:
+    # ==========================
+    # 数据库连接配置（请根据自己本地或云端数据库修改）
+    # ==========================
+    url: jdbc:mysql://localhost:3306/tlias
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Cxl_0613
+
+  servlet:
+    multipart:
+      # 文件上传大小限制（可按需修改）
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+# ==========================
+# MyBatis 相关配置
+# ==========================
+mybatis:
+  configuration:
+    # 控制台打印 SQL 日志（调试用）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 开启数据库字段下划线自动映射为 Java 驼峰命名
+    map-underscore-to-camel-case: true
+
+# ==========================
+# 日志级别设置
+# ==========================
+logging:
+  level:
+    org.springframework.jdbc.support.JdbcTransactionManager: info
+
+# ==========================
+# 阿里云 OSS 文件存储配置（如不使用，可留空或删除）
+# ==========================
+aliyun:
+  oss:
+    endpoint: https://oss-cn-your-region.aliyuncs.com
+    bucketName: your-bucket-name
+    region: your-region
+
+# ==========================
+# 会话 Cookie 设置（本地开发建议如下）
+# ==========================
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false       # 本地 HTTP 建议 false，上线 HTTPS 改 true
+        http-only: true
+        same-site: lax
+        path: /
+  port: 8080
