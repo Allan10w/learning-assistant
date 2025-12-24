@@ -31,7 +31,7 @@ public class JwtTest {
     public void testParseJwt() {
         // 生成一个有效期为 24 小时的 JWT
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("id", 1); 
+        dataMap.put("id", 1);
         dataMap.put("username", "admin");
         String token = Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, "aXRoZWltYQ==")
