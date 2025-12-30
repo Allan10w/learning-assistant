@@ -17,7 +17,7 @@ pipeline {
         EMAIL_RECIPIENTS = '1484096635@qq.com,2823546988@qq.com'
     }
 
-    //声明式流水线的核心，定义了流水线的执行流程
+    //声明式流水线的核心，定义了流水线的执行流程(声明式流水线的核心，定义了流水线的执行流程)
     stages {
         stage('Checkout') {
             steps {
