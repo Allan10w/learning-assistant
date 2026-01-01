@@ -22,7 +22,11 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     # 为容器添加 host.docker.internal 别名，这样后端代码中的 host.docker.internal 就能正确解析到宿主机的 IP 地址。
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frontend:
     # 前端服务
@@ -34,3 +38,8 @@ services:
       - backend
     # 依赖于 backend 服务，确保后端先启动
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
