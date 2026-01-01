@@ -91,13 +91,11 @@ pipeline {
                         // 尝试停止旧容器（如果有）并启动新容器
                         // 注意：需要确保 Jenkins 节点安装了 docker-compose 并有权限执行
                         try {
-                            //这一步调用了宿主机的 Docker 命令。Docker 会读取刚才前后端构建生成的产物
-                            // 1.停止并移除旧容器
-                            sh 'docker-compose down || true'
-                            // 2.构建新镜像并后台启动
-                            sh 'docker-compose up -d --build'
+                            // 仅停止并重启后端和前端服务，不影响 sonarqube
+                            sh 'docker-compose stop backend frontend || true'
+                            sh 'docker-compose rm -f backend frontend || true'
+                            sh 'docker-compose up -d --build backend frontend'
                             echo '部署完成！应用正在后台运行。'
-                            //（Frontend 的 dist 和 Backend 的 jar），把它们分别打包进新的镜像里，然后启动。
                         } catch (Exception e) {
                             echo "部署失败: ${e.getMessage()}"
                             throw e
