@@ -25,7 +25,7 @@ pipeline {
                     echo '正在拉取代码...'
                     checkout scm
                     // 拉取当前流水线代码来源
-                    // 如果你在jenkins任务里配的是GitHub仓库，他就自动拉取那个仓库的最新代码
+                    // 如果你在jenkins任务里配的是GitHub仓库的dev分支，他就自动拉取那个仓库的最新代码
                 }
             }
         }
@@ -122,8 +122,8 @@ pipeline {
                 // 1. 推送代码和标签到 Gitee
                 echo '正在推送代码和标签到 Gitee...'
                 withCredentials([usernamePassword(credentialsId: "${GIT_CREDENTIAL_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    // 推送当前分支到 main
-                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitee.com/allanchanice/learning-assistant.git HEAD:refs/heads/main"
+                    // 推送当前分支到 dev
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitee.com/allanchanice/learning-assistant.git HEAD:refs/heads/dev"
                     // 推送标签
                     sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@gitee.com/allanchanice/learning-assistant.git ${tagName}"
                 }
@@ -131,8 +131,8 @@ pipeline {
                 // 2. 推送代码和标签到 GitHub (实现双平台同步)
                 echo '正在推送代码和标签到 GitHub...'
                 withCredentials([usernamePassword(credentialsId: "${GITHUB_CREDENTIAL_ID}", passwordVariable: 'GH_PASSWORD', usernameVariable: 'GH_USERNAME')]) {
-                    // 推送当前分支到 main
-                    sh "git push https://${GH_USERNAME}:${GH_PASSWORD}@github.com/Allan10w/learning-assistant.git HEAD:refs/heads/main"
+                    // 推送当前分支到 dev
+                    sh "git push https://${GH_USERNAME}:${GH_PASSWORD}@github.com/Allan10w/learning-assistant.git HEAD:refs/heads/dev"
                     // 推送标签
                     sh "git push https://${GH_USERNAME}:${GH_PASSWORD}@github.com/Allan10w/learning-assistant.git ${tagName}"
                 }
