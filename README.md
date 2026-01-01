@@ -1,6 +1,6 @@
-# 🧠 Learning Assistant System （学习辅助系统）
+# 🏫 Campus Management System （校园管理系统）
 
-一个基于 **Spring Boot + Vite + MySQL** 的学习辅助平台，支持课程管理、学生管理、测验发布、学习进度追踪等核心功能。  
+一个基于 **Spring Boot + Vite + MySQL** 的校园管理平台，支持班级管理、学员管理、部门管理、员工管理等核心功能。  
 本项目包含前后端分离的完整实现及部署示例。
 
 ---
@@ -8,7 +8,7 @@
 ## 📂 项目结构
 
 ```
-learning-assistant/
+campus-management/
 │
 ├── frontend/           # 前端源码（Vite + Vue/React）
 │   ├── src/            # 页面与组件

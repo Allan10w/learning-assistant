@@ -1,6 +1,6 @@
 spring:
   application:
-    name: learning-assistant
+    name: campus-management
   datasource:
     # ==========================
     # 数据库连接配置（请根据自己本地或云端数据库修改）

@@ -5,8 +5,8 @@ services:
   backend:
     # 后端服务
     build: ../backend
-    container_name: learning-assistant-backend
-    # 给启动后的容器起个固定的名字。这样你可以用 `docker stop learning-assistant-backend` 来管理它，而不是每次都要查随机生成的 ID。
+    container_name: campus-management-backend
+    # 给启动后的容器起个固定的名字。这样你可以用 `docker stop campus-management-backend` 来管理它，而不是每次都要查随机生成的 ID。
     ports:
       - "8081:8080"
     # 端口映射: "宿主机端口:容器内端口"
@@ -27,7 +27,7 @@ services:
   frontend:
     # 前端服务
     build: ../frontend
-    container_name: learning-assistant-frontend
+    container_name: campus-management-frontend
     ports:
       - "80:80"
     depends_on:
