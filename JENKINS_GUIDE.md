@@ -126,7 +126,7 @@ sudo systemctl restart jenkins
 ```bash
 docker ps
 ```
-您应该能看到名为 `tlias-frontend` and `tlias-backend` 的两个容器正在运行。
+您应该能看到名为 `campus-management-frontend` 和 `campus-management-backend` 的两个容器正在运行。
 
 ### 3. 查看构建产物 (物理文件)
 如果您需要查看编译生成的 JAR 包或静态文件，它们位于 Jenkins 的工作目录中：

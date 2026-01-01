@@ -3,6 +3,6 @@
 #1.基于eclipse temurin openjdk 17版本
 FROM eclipse-temurin:17-jdk-jammy
 #2.把jenkins刚刚编译好的jar包复制进容器
-COPY target/tlias-web-management-0.0.1-SNAPSHOT.jar app.jar
+COPY target/campus-management-0.0.1-SNAPSHOT.jar app.jar
 #3.设置启动命令：告诉容器启动时要执行什么命令
 ENTRYPOINT ["java", "-jar", "/app.jar"]

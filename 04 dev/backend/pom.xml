@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.itheima</groupId>
-    <artifactId>tlias-web-management</artifactId>
+    <artifactId>campus-management</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>tlias-web-management</name>
-    <description>tlias-web-management</description>
+    <name>campus-management</name>
+    <description>campus-management</description>
     <url/>
     <licenses>
         <license/>
