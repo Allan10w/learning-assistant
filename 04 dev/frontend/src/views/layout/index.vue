@@ -34,7 +34,7 @@ const logout = () => {
     <el-container>
       <!-- Header 区域 -->
       <el-header class="header">
-        <span class="title">校园管理系统</span>
+        <span class="title">智慧校园管理系统v2.0</span>
         <span class="right_tool">
           <a href="">
             <el-icon><EditPen /></el-icon> 修改密码 &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;
