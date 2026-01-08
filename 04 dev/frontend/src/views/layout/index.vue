@@ -34,31 +34,36 @@ const logout = () => {
     <el-container>
       <!-- Header 区域 -->
       <el-header class="header">
-        <span class="title">校园管理系统v2.0</span>
-        <span class="right_tool">
-          <a href="">
-            <el-icon><EditPen /></el-icon> 修改密码 &nbsp;&nbsp;&nbsp; |  &nbsp;&nbsp;&nbsp;
-          </a>
-          <a href="javascript:void(0)" @click="logout">
-            <el-icon><SwitchButton /></el-icon> 退出登录 【{{ loginName }}】
-          </a>
-        </span>
+        <div class="header-content">
+          <span class="title">CampusOS</span>
+          <span class="right_tool">
+            <el-button link class="header-action">
+              <el-icon><EditPen /></el-icon> 修改密码
+            </el-button>
+            <el-divider direction="vertical" />
+            <el-button link class="header-action" @click="logout">
+              <el-icon><SwitchButton /></el-icon> 退出登录 【{{ loginName }}】
+            </el-button>
+          </span>
+        </div>
       </el-header>
       
       <el-container>
         <!-- 左侧菜单 -->
-        <el-aside width="200px" class="aside">
-
-          <el-menu router>
+        <el-aside width="240px" class="aside">
+          <div class="menu-spacer"></div>
+          <el-menu router :default-active="$route.path">
             <!-- 首页菜单 -->
             <el-menu-item index="/index">
-              <el-icon><Promotion /></el-icon> 首页
+              <el-icon><Promotion /></el-icon>
+              <span>首页</span>
             </el-menu-item>
             
             <!-- 班级管理菜单 -->
             <el-sub-menu index="/manage">
               <template #title>
-                <el-icon><Menu /></el-icon> 班级学员管理
+                <el-icon><Menu /></el-icon>
+                <span>班级学员管理</span>
               </template>
               <el-menu-item index="/clazz">
                 <el-icon><HomeFilled /></el-icon>班级管理
@@ -71,7 +76,8 @@ const logout = () => {
             <!-- 系统信息管理 -->
             <el-sub-menu index="/system">
               <template #title>
-                <el-icon><Tools /></el-icon>系统信息管理
+                <el-icon><Tools /></el-icon>
+                <span>系统信息管理</span>
               </template>
               <el-menu-item index="/dept">
                 <el-icon><HelpFilled /></el-icon>部门管理
@@ -84,7 +90,8 @@ const logout = () => {
             <!-- 数据统计管理 -->
             <el-sub-menu index="/report">
               <template #title>
-                <el-icon><Histogram /></el-icon>数据统计管理
+                <el-icon><Histogram /></el-icon>
+                <span>数据统计管理</span>
               </template>
               <el-menu-item index="/report/emp">
                 <el-icon><InfoFilled /></el-icon>员工信息统计
@@ -101,7 +108,9 @@ const logout = () => {
         
         <!-- 主展示区域 -->
         <el-main>
-          <router-view></router-view>
+          <div class="main-content-wrapper">
+             <router-view></router-view>
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -110,45 +119,73 @@ const logout = () => {
 
 <style scoped>
 .header {
-  background-image: linear-gradient(90deg, #0ea5e9 0%, #14b8a6 50%, #22c55e 100%);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  background-color: rgba(255, 255, 255, 0.85); /* Proper glass effect base */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: none; /* Remove heavy shadow */
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 24px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .title {
-  color: white;
-  font-size: 40px;
-  font-family: 楷体, serif;
-  line-height: 60px;
-  font-weight: bolder;
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  color: var(--el-text-color-primary);
+  font-size: 18px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
-.right_tool{
-  float: right;
-  line-height: 60px;
+.right_tool {
+  display: flex;
+  align-items: center;
 }
 
-a {
-  color: rgba(255, 255, 255, 0.95);
-  text-decoration: none;
-  transition: color .2s ease, opacity .2s ease;
+.header-action {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
 }
 
-.right_tool a:hover {
-  color: #ffffff;
-  opacity: 1;
+.header-action:hover {
+  color: var(--el-color-primary);
 }
 
 .aside {
-  width: 220px;
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
-  background-color: #ffffff;
-  height: 730px;
+  width: 240px;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: #F8F8F9; /* Sidebar gray */
+  height: calc(100vh - 60px); /* Fill height minus header */
+  overflow-y: auto;
 }
 
-/* 主体区域轻柔背景，提升层次感 */
+.menu-spacer {
+  height: 24px;
+}
+
 :deep(.el-main) {
-  background-color: #f7fafc;
+  background-color: var(--el-bg-color-page);
+  padding: 32px; /* Add breathing room */
+}
+
+.main-content-wrapper {
+  max-width: 1400px; /* Prevent content from stretching too wide on huge screens */
+  margin: 0 auto;
+}
+
+/* Fix Element Plus menu transition glitch */
+.el-menu {
+  background-color: transparent;
 }
 </style>

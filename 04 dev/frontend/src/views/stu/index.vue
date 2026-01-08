@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { queryPageApi , addApi, queryInfoApi, updateApi, deleteApi, handleViolationApi} from '@/api/stu'
 import { queryAllApi as queryAllClazzApi } from '@/api/clazz'
 import { ElMessage, ElMessageBox } from 'element-plus'
-
+import { Plus, Delete, Search } from '@element-plus/icons-vue' // Import icons explicitly if needed, though they are likely globally registered
 
 //学历列表数据
 const degrees = ref([{ name: '初中', value: 1 },{ name: '高中', value: 2 },{ name: '大专', value: 3 },{ name: '本科', value: 4 },{ name: '硕士', value: 5 },{ name: '博士', value: 6 }])
@@ -239,191 +239,255 @@ const openViolation = (id) => {
 </script>
 
 <template>
-    <!-- 顶部标题 -->
-    <div>
-      <div id="title">学员管理</div><br>
+  <div class="page-container">
+    <!-- 顶部标题与操作栏 -->
+    <div class="page-header">
+      <div class="title-area">
+        <h2 class="page-title">学员管理</h2>
+        <span class="page-subtitle">管理全校学生档案与信息</span>
+      </div>
+      <div class="action-area">
+        <el-button type="primary" @click="addStu();resetForm(stuFormRef)">
+          <el-icon class="el-icon--left"><Plus /></el-icon>新增学员
+        </el-button>
+        <el-button type="danger" plain @click="delByIds()" :disabled="selectIds.length === 0">
+          <el-icon class="el-icon--left"><Delete /></el-icon>批量删除
+        </el-button>
+      </div>
     </div>
 
-    <!-- 条件搜索表单 -->
-    <el-form :inline="true" :model="searchStu" class="demo-form-inline">
-      <el-form-item label="姓名">
-        <el-input v-model="searchStu.name" placeholder="请输入学生姓名"/>
-      </el-form-item>
+    <!-- 筛选卡片 -->
+    <el-card class="filter-card" shadow="hover">
+      <el-form :inline="true" :model="searchStu" class="filter-form">
+        <el-form-item label="姓名">
+          <el-input v-model="searchStu.name" placeholder="搜索姓名" clearable />
+        </el-form-item>
 
-      <el-form-item label="最高学历">
-        <el-select v-model="searchStu.degree" placeholder="请选择">
-          <el-option v-for="degree in degrees" :label="degree.name" :value="degree.value" />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="最高学历">
+          <el-select v-model="searchStu.degree" placeholder="全部学历" clearable style="width: 140px">
+             <el-option v-for="degree in degrees" :key="degree.value" :label="degree.name" :value="degree.value" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item label="所属班级">
-        <el-select v-model="searchStu.clazzId" placeholder="请选择">
-          <el-option v-for="clazz in clazzs" :label="clazz.name" :value="clazz.id" />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="所属班级">
+          <el-select v-model="searchStu.clazzId" placeholder="全部班级" clearable filterable style="width: 180px">
+             <el-option v-for="clazz in clazzs" :key="clazz.id" :label="clazz.name" :value="clazz.id" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item>
-        <el-button type="primary" @click="queryPage()">查询</el-button>
-        <el-button type="info" @click="clear()">清空</el-button>
-      </el-form-item>
-    </el-form>
+        <el-form-item>
+          <el-button @click="queryPage()">
+            <el-icon><Search /></el-icon>
+          </el-button>
+          <el-button link @click="clear()">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <div class="spacer"></div>
     
-    <!-- 功能按钮 -->
-    <el-button type="success" @click="addStu();resetForm(stuFormRef)">+ 新增学员</el-button>
-    <el-button type="danger" @click="delByIds()">- 批量删除</el-button>
-    <br><br>
-    
-    
-    <!-- 列表展示 -->
-    <el-table :data="tableData" border style="width: 100%" fit @selection-change="handleSelectionChange">
-      <el-table-column type="selection"  align="center" width="35" />
-      <el-table-column prop="name" label="姓名" align="center" width="100px" />
-      <el-table-column prop="no" label="学号" align="center" width="130px" />
-      <el-table-column prop="clazzName" label="班级" align="center" width="160px"/>
-      <el-table-column prop="gender" label="性别" align="center" width="70px" >
-        <template #default="scope">
-          {{ scope.row.gender == 1 ? '男': '女' }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" label="手机号" align="center" width="130px"/>
-      <el-table-column prop="degree" label="最高学历" align="center" width="90px">
-        <template #default="scope">
-          <span v-if="scope.row.degree == 1">初中</span>
-          <span v-else-if="scope.row.degree == 2">高中</span>
-          <span v-else-if="scope.row.degree == 3">大专</span>
-          <span v-else-if="scope.row.degree == 4">本科</span>
-          <span v-else-if="scope.row.degree == 5">硕士</span>
-          <span v-else-if="scope.row.degree == 6">博士</span>
-          <span v-else>其他</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="violationCount" label="违纪次数" align="center" width="85px" />
-      <el-table-column prop="violationScore" label="违纪扣分" align="center" width="85px" />
-      <el-table-column prop="updateTime" label="最后修改时间" align="center" width="170px"/>
-      <el-table-column label="操作" align="center">
-        <template #default="scope">
-          <el-button type="primary" size="small" @click="updateStu(scope.row.id) ;resetForm(stuFormRef)">编辑</el-button>
-          <el-button type="warning" size="small" @click="openViolation(scope.row.id)">违纪</el-button>
-          <el-button type="danger" size="small" @click="delById(scope.row.id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <br>
+    <!-- 数据列表 -->
+    <el-card class="table-card" shadow="never">
+      <el-table :data="tableData" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" align="center" width="40" />
+        
+        <el-table-column prop="name" label="姓名" min-width="100">
+          <template #default="scope">
+            <span class="text-strong">{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="no" label="学号" min-width="120" class-name="mono-font" />
+        <el-table-column prop="clazzName" label="班级" min-width="140" />
+        
+        <el-table-column prop="gender" label="性别" width="70">
+          <template #default="scope">
+            {{ scope.row.gender == 1 ? '男': '女' }}
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="phone" label="手机号" width="120" />
+        
+        <el-table-column prop="degree" label="最高学历" width="90">
+          <template #default="scope">
+            <el-tag size="small" type="info" effect="plain">{{ degrees.find(d => d.value == scope.row.degree)?.name || '其他' }}</el-tag>
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="violationCount" label="违纪次数" align="right" width="100">
+           <template #default="scope">
+             <span :class="{'text-danger': scope.row.violationCount > 0}">{{ scope.row.violationCount }}</span>
+           </template>
+        </el-table-column>
+        
+        <el-table-column prop="violationScore" label="扣分" align="right" width="80">
+            <template #default="scope">
+             <span :class="{'text-danger': scope.row.violationScore > 0}">{{ scope.row.violationScore }}</span>
+           </template>
+        </el-table-column>
+        
+        <el-table-column prop="updateTime" label="更新时间" width="160" align="right" class-name="text-secondary" />
+        
+        <el-table-column label="操作" width="180" fixed="right" align="right">
+          <template #default="scope">
+            <el-button type="primary" link @click="updateStu(scope.row.id);resetForm(stuFormRef)">编辑</el-button>
+            <el-button type="warning" link @click="openViolation(scope.row.id)">违纪</el-button>
+            <el-button type="danger" link @click="delById(scope.row.id)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <!-- 分页组件Pagination -->
-    <el-pagination
-      v-model:current-page="pagination.currentPage"
-      v-model:page-size="pagination.pageSize"
-      :page-sizes="[5, 10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="pagination.total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+      <!-- 分页组件 -->
+      <div class="pagination-wrapper">
+        <el-pagination
+          v-model:current-page="pagination.currentPage"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[5, 10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next"
+          :total="pagination.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          background
+        />
+      </div>
+    </el-card>
 
+    <!-- 新增/修改学员对话框 -->
+    <el-dialog v-model="dialogFormVisible" :title="formTitle" width="600px" destroy-on-close class="app-dialog">
+      <el-form :model="stu" ref="stuFormRef" :rules="rules" label-position="top">
+        <div class="form-grid">
+           <!-- Row 1 -->
+           <el-form-item label="姓名" prop="name">
+              <el-input v-model="stu.name" placeholder="请输入姓名"/>
+           </el-form-item>
+           <el-form-item label="学号" prop="no">
+              <el-input v-model="stu.no" placeholder="请输入学号"/>
+           </el-form-item>
+           
+           <!-- Row 2 -->
+           <el-form-item label="性别" prop="gender">
+              <el-select v-model="stu.gender" placeholder="选择性别" style="width: 100%;">
+                <el-option v-for="gender in genders" :key="gender.value" :label="gender.name" :value="gender.value" />
+              </el-select>
+           </el-form-item>
+           <el-form-item label="手机号" prop="phone">
+              <el-input v-model="stu.phone" placeholder="请输入手机号"/>
+           </el-form-item>
+           
+           <!-- Row 3 -->
+           <el-form-item label="身份证号" prop="idCard" class="full-width">
+              <el-input v-model="stu.idCard" placeholder="请输入身份证号"/>
+           </el-form-item>
+           
+           <!-- Row 4 -->
+           <el-form-item label="所属班级" prop="clazzId">
+              <el-select v-model="stu.clazzId" placeholder="选择班级" style="width: 100%;">
+                <el-option v-for="clazz in clazzs" :key="clazz.id" :label="clazz.name" :value="clazz.id" />
+              </el-select>
+           </el-form-item>
+           <el-form-item label="最高学历">
+              <el-select v-model="stu.degree" placeholder="选择学历" style="width: 100%;">
+                <el-option v-for="degree in degrees" :key="degree.value" :label="degree.name" :value="degree.value" />
+              </el-select>
+           </el-form-item>
+           
+           <!-- Row 5 -->
+           <el-form-item label="是否院校" prop="isCollege">
+             <el-radio-group v-model="stu.isCollege">
+                <el-radio v-for="w in whethers" :key="w.value" :label="w.value">{{ w.name }}</el-radio>
+             </el-radio-group>
+           </el-form-item>
+           <el-form-item label="毕业时间">
+              <el-date-picker v-model="stu.graduationDate" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%;"/>
+           </el-form-item>
+           
+           <!-- Row 6 -->
+           <el-form-item label="联系地址" class="full-width">
+              <el-input v-model="stu.address" placeholder="请输入详细地址" type="textarea" :rows="2"/>
+           </el-form-item>
+        </div>
+      </el-form>
 
-
-  
-  <!-- 新增/修改学员对话框 -->
-  <el-dialog v-model="dialogFormVisible" :title="formTitle" width="50%">
-    <el-form :model="stu" ref="stuFormRef" :rules="rules">
-      <!-- 第一行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="姓名" :label-width="labelWidth" prop="name">
-            <el-input v-model="stu.name" placeholder="请输入学员姓名"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="学号" :label-width="labelWidth" prop="no">
-            <el-input v-model="stu.no" placeholder="请输入学员学号"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      
-      <!-- 第二行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="性别" :label-width="labelWidth"  prop="gender">
-            <el-select v-model="stu.gender" placeholder="请选择" style="width: 100%;">
-              <el-option v-for="gender in genders" :label="gender.name" :value="gender.value" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="手机号" :label-width="labelWidth"  prop="phone">
-            <el-input v-model="stu.phone" placeholder="请输入手机号"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <!-- 第三行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="身份证号" :label-width="labelWidth"  prop="idCard">
-            <el-input v-model="stu.idCard" placeholder="请输入身份证号"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="是否院校" :label-width="labelWidth" prop="isCollege">
-            <el-select v-model="stu.isCollege" placeholder="请选择" style="width: 100%;">
-              <el-option v-for="w in whethers" :label="w.name" :value="w.value" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <!-- 第四行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="联系地址" :label-width="labelWidth">
-            <el-input v-model="stu.address" placeholder="请输入联系地址"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="最高学历" :label-width="labelWidth">
-            <el-select v-model="stu.degree" placeholder="请选择" style="width: 100%;">
-              <el-option v-for="degree in degrees" :label="degree.name" :value="degree.value" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-
-      <!-- 第五行 -->
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="毕业时间" :label-width="labelWidth">
-            <el-date-picker v-model="stu.graduationDate" type="date" placeholder="请选择毕业时间" value-format="YYYY-MM-DD" style="width: 100%;"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="所属班级" :label-width="labelWidth">
-            <el-select v-model="stu.clazzId" placeholder="请选择" style="width: 100%;">
-              <el-option v-for="clazz in clazzs" :label="clazz.name" :value="clazz.id" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </el-form>
-
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogFormVisible = false; resetForm(stuFormRef)">取消</el-button>
-        <el-button type="primary" @click="save(stuFormRef)">保存</el-button>
-      </span>
-    </template>
-  </el-dialog>
-
-
-  <!-- 违纪处理 -->
-
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false; resetForm(stuFormRef)">取消</el-button>
+          <el-button type="primary" @click="save(stuFormRef)">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
-
 <style scoped>
-#title {
-  font-size: 20px;
+.page-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 24px;
   font-weight: 600;
+  color: var(--el-text-color-primary);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+.filter-card {
+  margin-bottom: 16px;
+  border: none;
+}
+
+.filter-form .el-form-item {
+  margin-bottom: 0;
+  margin-right: 24px;
+}
+
+.table-card {
+  border: none;
+}
+
+.pagination-wrapper {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.text-strong {
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+}
+
+.text-danger {
+  color: var(--el-color-danger);
+}
+
+.text-secondary {
+  color: var(--el-text-color-secondary);
+}
+
+.mono-font {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Dialog Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.full-width {
+  grid-column: span 2;
 }
 </style>
