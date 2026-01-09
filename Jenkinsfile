@@ -59,6 +59,20 @@ pipeline {
                             }
                         }
                         echo 'SonarQube 已就绪！'
+
+                        echo '正在生成 SonarQube Token...'
+                        // 使用默认账户 admin:admin 生成 Token (名称冲突则先不处理，因为是新实例)
+                        def response = sh(script: 'curl -s -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate?name=jenkins-token"', returnStdout: true).trim()
+                        // 简单的提取逻辑: {"name":"...","token":"sqp_..."}
+                        def token = sh(script: "echo '${response}' | grep -o '\"token\":\"[^\"]*\"' | cut -d'\"' -f4", returnStdout: true).trim()
+                        
+                        if (token) {
+                            echo "Token 生成成功"
+                            // 保存 Token 到文件，供后续阶段使用
+                            writeFile file: 'sonar-token.txt', text: token
+                        } else {
+                            error "Token 生成失败: ${response}"
+                        }
                     }
                 }
             }
@@ -106,11 +120,17 @@ pipeline {
                 dir('04 dev/backend') {
                     script {
                         echo '正在进行代码质量与安全扫描...'
+                        
+                        // 读取 'Prepare Environment' 阶段生成的 Token
+                        // 注意路径：backend 目录相对于 deploy 目录 (token在deploy目录下)
+                        def token = readFile('../deploy/sonar-token.txt').trim()
+                        
                         // 需要在Jenkins中配置SonarQube服务器 (Manage Jenkins -> System -> SonarQube servers)
                         // 这里的 'SonarQube' 是你在Jenkins设置里给服务器起的名字
                         withSonarQubeEnv('SonarQube') {
                             // 执行Maven Sonar插件，jacoco报告会自动被识别
-                            sh 'mvn sonar:sonar'
+                            // 显式传递 token 参数，解决认证问题
+                            sh "mvn sonar:sonar -Dsonar.token=${token}"
                         }
                     }
                 }
