@@ -30,6 +30,30 @@ pipeline {
             }
         }
 
+        stage('Prepare Environment') {
+            steps {
+                dir('04 dev/deploy') {
+                    script {
+                        echo '正在检查并启动基础环境...'
+                        // 确保 SonarQube 已启动
+                        sh 'docker-compose up -d sonarqube'
+                        
+                        echo '等待 SonarQube 启动完毕...'
+                        // 循环检查直到端口 9000 可用 (最多等待 2 分钟)
+                        timeout(time: 2, unit: 'MINUTES') {
+                            waitUntil {
+                                script {
+                                    def r = sh script: 'curl -s -o /dev/null -w "%{http_code}" http://localhost:9000', returnStdout: true
+                                    return (r.trim() == '200' || r.trim() == '401') // 200 OK 或 401 Unauthorized (需要登录但服务已起)
+                                }
+                            }
+                        }
+                        echo 'SonarQube 已就绪！'
+                    }
+                }
+            }
+        }
+
         stage('Build Frontend') {
             steps {
                 dir('04 dev/frontend') { // 切换工作目录到前端源码文件夹
