@@ -35,36 +35,25 @@ pipeline {
                 dir('04 dev/deploy') {
                     script {
                         echo '正在检查并启动基础环境...'
-                        // 确保环境纯净：先停止并删除旧容器
-                        sh 'docker-compose stop sonarqube || true'
-                        sh 'docker-compose rm -f sonarqube || true'
+                        // 彻底清理环境：停止所有服务并删除卷 (解决 H2 数据库不支持升级的问题)
+                        // 注意：这会清除 SonarQube 的历史数据，但在开发环境中是可接受的
+                        sh 'docker-compose down -v || true'
                         
                         // 启动 SonarQube
                         sh 'docker-compose up -d sonarqube'
                         
                         echo '等待 SonarQube 启动完毕...'
-                        // 循环检查直到服务完全可用 (最多等待 5 分钟)
-                        timeout(time: 5, unit: 'MINUTES') {
+                        // 循环检查直到服务完全可用 (最多等待 3 分钟)
+                        timeout(time: 3, unit: 'MINUTES') {
                             waitUntil {
                                 script {
-                                    // 检查当前状态
-                                    def status = sh(script: 'curl -s http://localhost:9000/api/system/status | grep -o "DB_MIGRATION_NEEDED" || true', returnStdout: true).trim()
-                                    
-                                    if (status == "DB_MIGRATION_NEEDED") {
-                                        echo '检测到数据库需要迁移，正在触发迁移...'
-                                        // 触发迁移
-                                        sh 'curl -X POST -u admin:admin http://localhost:9000/api/system/migrate_db'
-                                        sleep 10 // 等待一会儿让迁移开始
-                                        return false
-                                    }
-                                    
                                     // 检查是否已就绪 (UP)
+                                    // 新环境启动不需要迁移，应该直接进入 UP 状态
                                     def up = sh(script: 'curl -s http://localhost:9000/api/system/status | grep -o "UP" || true', returnStdout: true).trim()
                                     if (up == "UP") {
                                         return true
                                     }
-                                    
-                                    echo 'SonarQube 尚未就绪，当前状态检查中...'
+                                    echo "SonarQube 尚未就绪..."
                                     return false 
                                 }
                             }
